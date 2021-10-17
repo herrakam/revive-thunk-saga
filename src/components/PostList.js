@@ -6,7 +6,7 @@ function PostList({ posts }) {
     <>
       <ul>
         {posts.map((post) => (
-          <li id={post.id}>
+          <li key={post.id}>
             <Link to={`/${post.id}`}>{post.title}</Link>
           </li>
         ))}
