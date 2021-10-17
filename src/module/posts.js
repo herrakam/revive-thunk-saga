@@ -1,5 +1,5 @@
 import * as postAPI from "../api/posts";
-
+import { put, takeEvery, call } from "redux-saga/effects";
 const GET_POSTS = "posts/GET_POSTS";
 const GET_POSTS_SUCCESS = "posts/GET_POSTS_SUCCESS";
 const GET_POSTS_ERROR = "posts/GET_POSTS_ERROR";
@@ -8,21 +8,40 @@ const GET_POST = "posts/GET_POST";
 const GET_POST_SUCCESS = "posts/GET_POST_SUCCESS";
 const GET_POST_ERROR = "posts/GET_POST_ERROR";
 
-export const getPosts = () => async (dispatch) => {
-  dispatch({ type: GET_POSTS });
+// export const getPosts = () => async (dispatch) => {
+//   dispatch({ type: GET_POSTS });
+//   try {
+//     const posts = await postAPI.getPosts();
+//     dispatch({
+//       type: GET_POSTS_SUCCESS,
+//       posts,
+//     });
+//   } catch (e) {
+//     dispatch({
+//       type: GET_POSTS_ERROR,
+//       error: e,
+//     });
+//   }
+// };
+
+export const getPosts = () => ({
+  type: GET_POSTS,
+});
+
+function* getPostsSaga() {
   try {
-    const posts = await postAPI.getPosts();
-    dispatch({
+    const posts = yield call(postAPI.getPosts);
+    yield put({
       type: GET_POSTS_SUCCESS,
       posts,
     });
   } catch (e) {
-    dispatch({
+    yield put({
       type: GET_POSTS_ERROR,
       error: e,
     });
   }
-};
+}
 
 export const getPost = (id) => async (dispatch) => {
   dispatch({ type: GET_POST });
@@ -39,6 +58,10 @@ export const getPost = (id) => async (dispatch) => {
     });
   }
 };
+
+export function* postSaga() {
+  yield takeEvery(GET_POSTS, getPostsSaga);
+}
 
 const initialState = {
   posts: {
@@ -96,7 +119,7 @@ export default function posts(state = initialState, action) {
         ...state,
         post: {
           loading: false,
-          data: action.posts,
+          data: action.post,
           error: null,
         },
       };
