@@ -28,6 +28,24 @@ export const getPosts = () => ({
   type: GET_POSTS,
 });
 
+export const getPost = (id) => ({
+  type: GET_POST,
+});
+
+function* getPostSaga(id) {
+  try {
+    const post = yield call(postAPI.getPostsById(id));
+    yield put({
+      type: GET_POST_SUCCESS,
+      post,
+    });
+  } catch (e) {
+    yield put({
+      type: GET_POST_ERROR,
+      error: e,
+    });
+  }
+}
 function* getPostsSaga() {
   try {
     const posts = yield call(postAPI.getPosts);
@@ -43,24 +61,25 @@ function* getPostsSaga() {
   }
 }
 
-export const getPost = (id) => async (dispatch) => {
-  dispatch({ type: GET_POST });
-  try {
-    const post = await postAPI.getPostsById(id);
-    dispatch({
-      type: GET_POST_SUCCESS,
-      post,
-    });
-  } catch (e) {
-    dispatch({
-      type: GET_POST_ERROR,
-      error: e,
-    });
-  }
-};
+// export const getPost = (id) => async (dispatch) => {
+//   dispatch({ type: GET_POST });
+//   try {
+//     const post = await postAPI.getPostsById(id);
+//     dispatch({
+//       type: GET_POST_SUCCESS,
+//       post,
+//     });
+//   } catch (e) {
+//     dispatch({
+//       type: GET_POST_ERROR,
+//       error: e,
+//     });
+//   }
+// };
 
 export function* postSaga() {
   yield takeEvery(GET_POSTS, getPostsSaga);
+  yield takeEvery(GET_POST, getPostSaga);
 }
 
 const initialState = {
